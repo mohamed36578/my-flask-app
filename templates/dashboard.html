@@ -131,9 +131,9 @@
             <h2 class="mb-4">Dynamic Cards Builder</h2>
             
           
-          <div class="bgr-group mb-3">
-            <p id="send" ></p>
-            <h1 id="bgr">pizza_1</h1>
+          <div class="bgr-group mb-3" id="bgr-group" >
+            
+            <h1 id="bgr"></h1>
         
             <input type="text" id="bgrInput" placeholder="Enter background name">
             <button class="btn btn-primary" id="saveBgr">Save Background</button>
@@ -198,10 +198,12 @@
       const saved = localStorage.getItem("cardsData");
       const savedBgr = localStorage.getItem("bgr");
       const bgrElement = document.getElementById("bgr");
+      const bgrGroup = document.getElementById('bgr-group');
       const frame = document.getElementById('phone-frame');
 
       if (savedBgr) {
         bgrElement.textContent = savedBgr;
+        bgrGroup.style.display = 'none';
         frame.style.backgroundImage = `url(https://github.com/mohamed36578/my_photo/blob/3b4b55159f43de2cbabf4aa952888dfc8f735300/img/${savedBgr}.jpg?raw=true`;
       }
 
