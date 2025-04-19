@@ -65,12 +65,11 @@ def dashboard():
     id_token = session["id_token"]
 
     if request.method == "POST":
-        post_id = request.form.get("post_id")  # user-defined ID
-        title = request.form.get('title').strip()  # remove extra spaces
+        post_id = request.form.get("bgrInput")  # user-defined ID
         content = request.form.get('content').strip()
 
         data = {
-            "title": title,
+            
             "content": content
         }
 
@@ -89,14 +88,14 @@ def submit_post():
     if "user" not in session:
         return redirect("/")
 
-    title = request.form["title"]
+    
     content = request.form["content"]
 
     user_id = session["user"]
     id_token = session["id_token"]
 
     post_data = {
-        "title": title,
+        
         "content": content
     }
 
