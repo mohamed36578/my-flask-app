@@ -104,15 +104,15 @@
 <body class="bg-light">
 
     <div class="container py-4 dashboard-wrapper">
-        <h3 class="mb-4 text-center text-md-start">Welcome! Submit a Post</h3>
+        <h3 class="mb-4 text-center text-md-start">Selim-Tech Admin panel</h3>
 
         <form method="POST" action="/dashboard" class="card p-4 shadow-sm mb-5">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
             <div id="post-id-container" class="mb-3">
-                <label for="post_id_input" class="form-label">Enter Post ID</label>
-                <input type="text" class="form-control" id="post_id_input" placeholder="Post ID">
-                <button type="button" class="btn btn-secondary mt-2" id="save_post_id">Save ID</button>
+                
+                <input type="text" class="form-control" id="post_id_input" placeholder="Enter your name">
+                <button type="button" class="btn btn-secondary mt-2" id="save_post_id">Save</button>
             </div>
 
             <div class="mb-3" style="display: none;" >
@@ -125,27 +125,28 @@
                 <textarea name="content" id="content" class="form-control" placeholder="Content" rows="4" required></textarea>
             </div>
 
-            <button type="submit" onclick="copyEmbed()" class="btn btn-primary w-100">Save Post</button>
+            <button type="submit" onclick="copyEmbed();sendMessageOnWhatsApp('+221706273565', 'Hello! I wont to confirm that i did made some modifications.')" class="btn btn-primary w-100">Send to the database</button>
         </form>
         <div class="container">
-            <h2 class="mb-4">Dynamic Cards Builder</h2>
+           
             
           
           <div class="bgr-group mb-3" id="bgr-group" >
             
             <h1 id="bgr"></h1>
         
-            <input type="text" id="bgrInput" placeholder="Enter background name">
-            <button class="btn btn-primary" id="saveBgr">Save Background</button>
+            <input type="text" id="bgrInput" placeholder="Enter the restaurent name">
+            <button class="btn btn-primary" id="saveBgr">Save</button>
             </div>
+            <h2 class="mb-4">You can start bulding your menue from here</h2>
             <div class="input-group mb-3">
-              <input type="text" id="cardTitleInput" class="form-control" placeholder="Enter card title">
-              <button class="btn btn-primary" onclick="createCard()">Create Card</button>
+              <input type="text" id="cardTitleInput" class="form-control" placeholder="Enter the section titele">
+              <button class="btn btn-primary" onclick="createCard()">save</button>
             </div>
         
             <div id="cardsContainer" class="row gy-4"></div>
         
-            <h4 class="mt-5">Live Embed Preview</h4>
+            <h4 class="mt-5">You can see the result here</h4>
 
             
         
@@ -162,6 +163,17 @@
     </div>
 
     <script>
+      
+function sendMessageOnWhatsApp(phoneNumber, message) {
+  // Encode message for URL
+  const encodedMessage = encodeURIComponent(message);
+  // Create WhatsApp URL
+  const url = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+  // Redirect user
+  window.location.href = url;
+}
+
+
         document.addEventListener("DOMContentLoaded", function () {
             const postIdContainer = document.getElementById("post-id-container");
             const postIdInput = document.getElementById("post_id_input");
