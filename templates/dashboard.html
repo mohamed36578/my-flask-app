@@ -6,265 +6,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .card-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-        .draggable {
-            cursor: grab;
-        }
-        .item-input-group {
-            display: flex;
-            gap: 0.5rem;
-        }
-    </style>
+
 </head>
 <body class="bg-light">
-    <div class="container py-5">
-        <h2 class="text-center mb-4">Your Dashboard</h2>
+  <div class="container py-4 dashboard-wrapper">
+    <h3 class="mb-4 text-center text-md-start">Selim-Tech Admin panel</h3>
 
-        <!-- Existing Flask Post Form -->
-        <div class="card mb-4 shadow-sm">
-            <div class="card-header bg-primary text-white">Create a New Post</div>
-            <div class="card-body">
-                <form method="POST" action="/dashboard">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <div class="mb-3">
-                        <label for="title" class="form-label">Post Title</label>
-                        <input type="text" class="form-control" name="title" id="title" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="content" class="form-label">Post Content</label>
-                        <textarea class="form-control" name="content" id="content" rows="4" required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-success">Submit Post</button>
-                </form>
-            </div>
-        </div>
+    <div class="card-body">
+      <form method="POST" action="/dashboard">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="mb-3">
+              <label for="title" class="form-label">Post Title</label>
+              <input type="text" class="form-control" name="title" id="title" required>
+          </div>
+          <div class="mb-3">
+              <label for="content" class="form-label">Post Content</label>
+              <textarea class="form-control" name="content" id="content" rows="4" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-success">Send</button>
+      </form>
+  </div>
 
-        <!-- Display User's Posts -->
-        {% if posts %}
-            <h4 class="mb-3">Your Posts</h4>
-            <div class="row">
-                {% for key, post in posts.items() %}
-                <div class="col-md-6 mb-4">
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ post.title }}</h5>
-                            <p class="card-text">{{ post.content }}</p>
-                            <p class="text-muted small">Post ID: <code>{{ key }}</code></p>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <p class="text-muted">You haven't posted anything yet.</p>
-        {% endif %}
-
-        <!-- Custom Card Manager -->
-        <hr class="my-5">
-        <h4>Dynamic Cards with Items</h4>
-        <button class="btn btn-primary mb-3" onclick="createCard()">+ Add Card</button>
-        <div id="cardsContainer" class="card-container"></div>
-
-        <!-- Hidden content field for Firebase export -->
-        <input type="hidden" id="contentInput" name="content">
-
-        <!-- Export Button -->
-        <div class="mt-3">
-            <button class="btn btn-success" onclick="exportData()">Export to contentInput</button>
-        </div>
-    </div>
 
     <!-- JS -->
-    <script>
-        
-let cardCounter = 0;
-
-function createCard() {
-  const title = document.getElementById("cardTitleInput").value.trim();
-  if (!title) return alert("Please enter a card title");
-
-  const cardId = `card-${cardCounter++}`;
-  const container = document.getElementById("cardsContainer");
-
-  const cardHTML = `
-    <div class="col-md-6" id="${cardId}">
-      <div class="card shadow">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <div class="d-flex align-items-center">
-            <h5 class="mb-0 editable-title me-2" onclick="editCardTitle(this)">${title}</h5>
-            <span class="drag-handle" title="Drag card" style="cursor: grab;">⠿</span>
-          </div>
-          <button class="btn btn-sm btn-danger" onclick="deleteCard('${cardId}')">Delete Card</button>
-        </div>
-        <div class="card-body">
-          <form onsubmit="event.preventDefault(); addItem('${cardId}', this)">
-            <div class="mb-2">
-              <input type="text" class="form-control" placeholder="Item Name" required>
-            </div>
-            <div class="mb-2">
-              <input type="number" class="form-control" placeholder="Price" required>
-            </div>
-            <div class="mb-2">
-              <textarea class="form-control" rows="2" placeholder="Description" required></textarea>
-            </div>
-            <button type="submit" class="btn btn-success">Add Item</button>
-          </form>
-          <div class="items mt-3"></div>
-        </div>
-      </div>
-    </div>
-  `;
-
-  container.insertAdjacentHTML('beforeend', cardHTML);
-}
-
-
-
-        function createItemElement(value) {
-            const div = document.createElement('div');
-            div.className = 'd-flex justify-content-between align-items-center mb-1';
-            div.innerHTML = `
-                <input type="text" class="form-control me-2" value="${value}">
-                <button class="btn btn-sm btn-danger" onclick="this.parentElement.remove()">✖</button>
-            `;
-            return div;
-        }
-
-function addItem(cardId, form) {
-  const name = form.querySelector('input[type="text"]').value.trim();
-  const price = form.querySelector('input[type="number"]').value.trim();
-  const desc = form.querySelector('textarea').value.trim();
-
-  if (!name || !price || !desc) return;
-
-  const itemHTML = `
-    <div class="item border rounded p-2 mb-2">
-      <div class="d-flex justify-content-between">
-        <div>
-          <strong>${name}</strong> - $${price}<br>
-          <small>${desc}</small>
-        </div>
-        <div>
-          <button class="btn btn-sm btn-outline-secondary me-1" onclick="editItem(this)">Edit</button>
-          <button class="btn btn-sm btn-outline-danger" onclick="deleteItem(this)">Delete</button>
-        </div>
-      </div>
-    </div>
-  `;
-
-  const itemsContainer = document.querySelector(`#${cardId} .items`);
-  itemsContainer.insertAdjacentHTML('beforeend', itemHTML);
-
-  form.reset();
-}
-
-function editItem(button) {
-  const itemDiv = button.closest('.item');
-  const name = itemDiv.querySelector('strong').innerText;
-  const price = itemDiv.innerText.match(/\$([0-9.]+)/)[1];
-  const desc = itemDiv.querySelector('small').innerText;
-
-  const newName = prompt("Edit Name:", name);
-  const newPrice = prompt("Edit Price:", price);
-  const newDesc = prompt("Edit Description:", desc);
-
-  if (newName && newPrice && newDesc) {
-    itemDiv.innerHTML = `
-      <div class="d-flex justify-content-between">
-        <div>
-          <strong>${newName}</strong> - $${newPrice}<br>
-          <small>${newDesc}</small>
-        </div>
-        <div>
-          <button class="btn btn-sm btn-outline-secondary me-1" onclick="editItem(this)">Edit</button>
-          <button class="btn btn-sm btn-outline-danger" onclick="deleteItem(this)">Delete</button>
-        </div>
-      </div>
-    `;
-  }
-}
-
-function deleteItem(button) {
-  const itemDiv = button.closest('.item');
-  itemDiv.remove();
-}
-function editCardTitle(el) {
-  const current = el.innerText;
-  const newTitle = prompt("Edit card title:", current);
-  if (newTitle) el.innerText = newTitle;
-}
-
-function deleteCard(cardId) {
-  const card = document.getElementById(cardId);
-  if (card) card.remove();
-}
-
-
-
-
-
-
-
-        
-
-
-function exportData() {
-  const container = document.getElementById("cardsContainer");
-  const contentInput = document.getElementById("content");
-
-  if (!container || !contentInput) {
-    alert("Missing cards container or content input!");
-    return;
-  }
-
-  // Get the inner HTML of the cardsContainer
-  const htmlContent = container.innerHTML.trim();
-
-  // Insert it into the hidden input for submission
-  contentInput.value = htmlContent;
-}
-
-
-
-
-
-
-        // Drag-and-drop support
-        let draggedCard = null;
-        function addCardDragEvents(card) {
-            card.addEventListener('dragstart', e => {
-                draggedCard = card;
-                card.style.opacity = '0.5';
-            });
-            card.addEventListener('dragend', () => {
-                draggedCard.style.opacity = '';
-                draggedCard = null;
-            });
-            card.addEventListener('dragover', e => {
-                e.preventDefault();
-            });
-            card.addEventListener('drop', e => {
-                e.preventDefault();
-                if (draggedCard && draggedCard !== card) {
-                    const container = document.getElementById('cardsContainer');
-                    const cards = Array.from(container.children);
-                    const draggedIndex = cards.indexOf(draggedCard);
-                    const targetIndex = cards.indexOf(card);
-                    if (draggedIndex < targetIndex) {
-                        container.insertBefore(draggedCard, card.nextSibling);
-                    } else {
-                        container.insertBefore(draggedCard, card);
-                    }
-                }
-            });
-        }
-    </script>
-
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
