@@ -10,13 +10,14 @@
 <body class="bg-light">
 
     <div class="container py-5">
-        <h2 class="text-center mb-4">Welcome to Your Dashboard</h2>
+        <h2 class="text-center mb-4"> Your Dashboard</h2>
 
         <!-- Post Form -->
         <div class="card mb-4 shadow-sm">
             <div class="card-header bg-primary text-white">Create a New Post</div>
             <div class="card-body">
                 <form method="POST" action="/dashboard">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
                         <label for="title" class="form-label">Post Title</label>
                         <input type="text" class="form-control" name="title" id="title" required>
