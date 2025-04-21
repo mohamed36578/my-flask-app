@@ -81,35 +81,49 @@
 
     <!-- JS -->
     <script>
-        let cardIdCounter = 0;
+        
+let cardCounter = 0;
 
-        function addCard(title = '', items = []) {
-            const cardId = `card-${cardIdCounter++}`;
-            const card = document.createElement('div');
-            card.className = 'card p-3 shadow-sm draggable';
-            card.setAttribute('draggable', true);
+function createCard() {
+  const title = document.getElementById("cardTitleInput").value.trim();
+  if (!title) return alert("Please enter a card title");
 
-            card.innerHTML = `
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <input type="text" class="form-control me-2" placeholder="Card Title" value="${title}">
-                    <button class="btn btn-sm btn-danger" onclick="this.closest('.card').remove()">✖</button>
-                </div>
-                <div class="item-list mb-2"></div>
-                <div class="item-input-group mb-2">
-                    <input type="text" class="form-control item-input" placeholder="Add item">
-                    <button class="btn btn-outline-secondary" onclick="addItem(this)">+</button>
-                </div>
-            `;
+  const cardId = `card-${cardCounter++}`;
+  const container = document.getElementById("cardsContainer");
 
-            const itemList = card.querySelector('.item-list');
-            items.forEach(item => {
-                const el = createItemElement(item);
-                itemList.appendChild(el);
-            });
+  const cardHTML = `
+    <div class="col-md-6" id="${cardId}">
+      <div class="card shadow">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center">
+            <h5 class="mb-0 editable-title me-2" onclick="editCardTitle(this)">${title}</h5>
+            <span class="drag-handle" title="Drag card" style="cursor: grab;">⠿</span>
+          </div>
+          <button class="btn btn-sm btn-danger" onclick="deleteCard('${cardId}')">Delete Card</button>
+        </div>
+        <div class="card-body">
+          <form onsubmit="event.preventDefault(); addItem('${cardId}', this)">
+            <div class="mb-2">
+              <input type="text" class="form-control" placeholder="Item Name" required>
+            </div>
+            <div class="mb-2">
+              <input type="number" class="form-control" placeholder="Price" required>
+            </div>
+            <div class="mb-2">
+              <textarea class="form-control" rows="2" placeholder="Description" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-success">Add Item</button>
+          </form>
+          <div class="items mt-3"></div>
+        </div>
+      </div>
+    </div>
+  `;
 
-            addCardDragEvents(card);
-            document.getElementById('cardsContainer').appendChild(card);
-        }
+  container.insertAdjacentHTML('beforeend', cardHTML);
+}
+
+
 
         function createItemElement(value) {
             const div = document.createElement('div');
@@ -121,46 +135,101 @@
             return div;
         }
 
-        function addItem(btn) {
-            const input = btn.parentElement.querySelector('.item-input');
-            const value = input.value.trim();
-            if (value) {
-                const itemEl = createItemElement(value);
-                btn.closest('.card').querySelector('.item-list').appendChild(itemEl);
-                input.value = '';
-            }
-        }
+function addItem(cardId, form) {
+  const name = form.querySelector('input[type="text"]').value.trim();
+  const price = form.querySelector('input[type="number"]').value.trim();
+  const desc = form.querySelector('textarea').value.trim();
+
+  if (!name || !price || !desc) return;
+
+  const itemHTML = `
+    <div class="item border rounded p-2 mb-2">
+      <div class="d-flex justify-content-between">
+        <div>
+          <strong>${name}</strong> - $${price}<br>
+          <small>${desc}</small>
+        </div>
+        <div>
+          <button class="btn btn-sm btn-outline-secondary me-1" onclick="editItem(this)">Edit</button>
+          <button class="btn btn-sm btn-outline-danger" onclick="deleteItem(this)">Delete</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const itemsContainer = document.querySelector(`#${cardId} .items`);
+  itemsContainer.insertAdjacentHTML('beforeend', itemHTML);
+
+  form.reset();
+}
+
+function editItem(button) {
+  const itemDiv = button.closest('.item');
+  const name = itemDiv.querySelector('strong').innerText;
+  const price = itemDiv.innerText.match(/\$([0-9.]+)/)[1];
+  const desc = itemDiv.querySelector('small').innerText;
+
+  const newName = prompt("Edit Name:", name);
+  const newPrice = prompt("Edit Price:", price);
+  const newDesc = prompt("Edit Description:", desc);
+
+  if (newName && newPrice && newDesc) {
+    itemDiv.innerHTML = `
+      <div class="d-flex justify-content-between">
+        <div>
+          <strong>${newName}</strong> - $${newPrice}<br>
+          <small>${newDesc}</small>
+        </div>
+        <div>
+          <button class="btn btn-sm btn-outline-secondary me-1" onclick="editItem(this)">Edit</button>
+          <button class="btn btn-sm btn-outline-danger" onclick="deleteItem(this)">Delete</button>
+        </div>
+      </div>
+    `;
+  }
+}
+
+function deleteItem(button) {
+  const itemDiv = button.closest('.item');
+  itemDiv.remove();
+}
+function editCardTitle(el) {
+  const current = el.innerText;
+  const newTitle = prompt("Edit card title:", current);
+  if (newTitle) el.innerText = newTitle;
+}
+
+function deleteCard(cardId) {
+  const card = document.getElementById(cardId);
+  if (card) card.remove();
+}
+
+
+
+
+
+
 
         
+
+
 function exportData() {
-    let html = '';
+  const container = document.getElementById("cardsContainer");
+  const contentInput = document.getElementById("content");
 
-    document.querySelectorAll('#cardsContainer .card').forEach(card => {
-        const title = card.querySelector('input[type="text"]').value.trim();
-        const items = card.querySelectorAll('.item-list input');
+  if (!container || !contentInput) {
+    alert("Missing cards container or content input!");
+    return;
+  }
 
-        html += `<div class="card">\n`;
-        html += `  <h5>${title}</h5>\n`;
+  // Get the inner HTML of the cardsContainer
+  const htmlContent = container.innerHTML.trim();
 
-        if (items.length > 0) {
-            html += `  <ul>\n`;
-            items.forEach(input => {
-                const itemVal = input.value.trim();
-                if (itemVal) {
-                    html += `    <li>${itemVal}</li>\n`;
-                }
-            });
-            html += `  </ul>\n`;
-        }
-
-        html += `</div>\n\n`;
-    });
-
-    const contentField = document.getElementById('content'); // use your original textarea
-    contentField.value = html;
-    console.log("Exported HTML:", html);
-    alert("Cards exported as HTML into the content field.");
+  // Insert it into the hidden input for submission
+  contentInput.value = htmlContent;
 }
+
+
 
 
 
