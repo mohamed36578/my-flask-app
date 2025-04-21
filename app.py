@@ -4,7 +4,7 @@ from datetime import timedelta
 import os
 import pyrebase
 from flask_wtf.csrf import CSRFProtect
-
+import time
 
 # Load environment variables
 load_dotenv()
@@ -83,24 +83,27 @@ def dashboard():
     posts = db.child("posts").child(user_id).get(id_token).val()
 
     return render_template("dashboard.html", posts=posts)
-
 @app.route("/submit", methods=["POST"])
 def submit_post():
     if "user" not in session:
         return redirect("/")
 
-    title = request.form["title"]
-    content = request.form["content"]
+    title = request.form["title"].strip()
+    content = request.form["content"].strip()
 
     user_id = session["user"]
     id_token = session["id_token"]
+
+    # Generate custom ID
+    post_id = f"post_{int(time.time())}"
 
     post_data = {
         "title": title,
         "content": content
     }
 
-    db.child("posts").child(user_id).push(post_data, id_token)
+    # Save using your own custom ID
+    db.child("posts").child(user_id).child(post_id).set(post_data, id_token)
 
     return redirect("/dashboard")
 

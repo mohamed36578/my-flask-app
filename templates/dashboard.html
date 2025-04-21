@@ -104,7 +104,7 @@
 <body class="bg-light">
 
     <div class="container py-4 dashboard-wrapper">
-        <h3 class="mb-4 text-center text-md-start">Selim-Tech Admin panel</h3>
+        <h3 class="mb-4 text-center text-md-start"> Admin panel</h3>
 
         <form method="POST" action="/dashboard" class="card p-4 shadow-sm mb-5">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -174,31 +174,31 @@ function sendMessageOnWhatsApp(phoneNumber, message) {
 }
 
 
-        document.addEventListener("DOMContentLoaded", function () {
-            const postIdContainer = document.getElementById("post-id-container");
-            const postIdInput = document.getElementById("post_id_input");
-            const saveButton = document.getElementById("save_post_id");
+        //document.addEventListener("DOMContentLoaded", function () {
+            //const postIdContainer = document.getElementById("post-id-container");
+            //const postIdInput = document.getElementById("post_id_input");
+            //const saveButton = document.getElementById("save_post_id");
 
-            const savedPostId = localStorage.getItem("post_id");
+            //const savedPostId = localStorage.getItem("post_id");
 
-            if (savedPostId) {
-                postIdContainer.style.display = "none";
+            //if (savedPostId) {
+                //postIdContainer.style.display = "none";
 
-                const hiddenInput = document.createElement("input");
-                hiddenInput.type = "hidden";
-                hiddenInput.name = "post_id";
-                hiddenInput.value = savedPostId;
-                document.querySelector("form").appendChild(hiddenInput);
-            }
+                //const hiddenInput = document.createElement("input");
+                //hiddenInput.type = "hidden";
+                //hiddenInput.name = "post_id";
+                //hiddenInput.value = savedPostId;
+              //  document.querySelector("form").appendChild(hiddenInput);
+            //}
 
-            saveButton.addEventListener("click", function () {
-                const postId = postIdInput.value.trim();
-                if (postId !== "") {
-                    localStorage.setItem("post_id", postId);
-                    location.reload();
-                }
-            });
-        });
+            //saveButton.addEventListener("click", function () {
+                //const postId = postIdInput.value.trim();
+                //if (postId !== "") {
+              //      localStorage.setItem("post_id", postId);
+            //        location.reload();
+          //      }
+        //    });
+      //  });
     </script>
 
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
