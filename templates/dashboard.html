@@ -131,25 +131,38 @@
             }
         }
 
-        function exportData() {
-    const data = [];
+        
+function exportData() {
+    let html = '';
+
     document.querySelectorAll('#cardsContainer .card').forEach(card => {
         const title = card.querySelector('input[type="text"]').value.trim();
-        const items = [];
-        card.querySelectorAll('.item-list input').forEach(input => {
-            const val = input.value.trim();
-            if (val) items.push(val);
-        });
-        if (title) {
-            data.push({ title, items });
+        const items = card.querySelectorAll('.item-list input');
+
+        html += `<div class="card">\n`;
+        html += `  <h5>${title}</h5>\n`;
+
+        if (items.length > 0) {
+            html += `  <ul>\n`;
+            items.forEach(input => {
+                const itemVal = input.value.trim();
+                if (itemVal) {
+                    html += `    <li>${itemVal}</li>\n`;
+                }
+            });
+            html += `  </ul>\n`;
         }
+
+        html += `</div>\n\n`;
     });
 
-    const contentField = document.getElementById('content'); // ← use your existing textarea
-    contentField.value = JSON.stringify(data, null, 2);
-    console.log("Exported:", contentField.value);
-    alert("Cards exported to content field.");
+    const contentField = document.getElementById('content'); // use your original textarea
+    contentField.value = html;
+    console.log("Exported HTML:", html);
+    alert("Cards exported as HTML into the content field.");
 }
+
+
 
 
         // Drag-and-drop support
