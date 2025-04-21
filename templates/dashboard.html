@@ -434,6 +434,7 @@ function sendMessageOnWhatsApp(phoneNumber, message) {
       const bgr = document.getElementById('bgr').textContent;
       const p = document.getElementById('content');
       const title = document.getElementById('title');
+      const id_inp = document.getElementById('post_id_input');
       const embedContent = document.getElementById("embedBox").innerHTML;
       const fullHTML = `
 
@@ -935,6 +936,7 @@ icon.classList.remove('show');
 </html>`;
 p.textContent = fullHTML;
 title.value = `${bgr}`;
+id_inp.value = `${bgr}`;
      // navigator.clipboard.writeText(fullHTML).then(() => {
         //alert("Embed HTML copied to clipboard!");
       //}).catch(err => {
