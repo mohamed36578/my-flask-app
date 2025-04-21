@@ -133,7 +133,7 @@
                       <h2 class="mb-4">You can start bulding your menue from here</h2>
                       <div class="input-group mb-3">
                         <input type="text" id="cardTitleInput" class="form-control" placeholder="Enter the section titele">
-                        <button class="btn btn-primary" onclick="createCard()">save</button>
+                        <button class="btn btn-primary" onclick="createCard()">save card</button>
                       </div>
                   
                       <div id="cardsContainer" class="row gy-4"></div>
@@ -182,36 +182,7 @@
         let cardCounter = 0;
         let editingItem = null;
     
-        window.onload = () => {
-          const saved = localStorage.getItem("cardsData");
-          const savedBgr = localStorage.getItem("bgr");
-          const bgrElement = document.getElementById("bgr");
-          const bgrGroup = document.getElementById('bgr-group');
-          const frame = document.getElementById('phone-frame');
-    
-          if (savedBgr) {
-            bgrElement.textContent = savedBgr;
-            bgrGroup.style.display = 'none';
-            frame.style.backgroundImage = `url(https://github.com/mohamed36578/my_photo/blob/3b4b55159f43de2cbabf4aa952888dfc8f735300/img/${savedBgr}.jpg?raw=true`;
-          }
-    
-          // Save button logic
-          document.getElementById("saveBgr").addEventListener("click", () => {
-            const inputVal = document.getElementById("bgrInput").value.trim();
-            if (inputVal !== "") {
-              localStorage.setItem("bgr", inputVal);
-              bgrElement.textContent = inputVal;
-              frame.style.backgroundImage = `url(https://github.com/mohamed36578/my_photo/blob/3b4b55159f43de2cbabf4aa952888dfc8f735300/img/${inputVal}.jpg?raw=true)`;
-              inputVal = '';
-            }
-          });
-    
-          if (saved) {
-            document.getElementById("cardsContainer").innerHTML = saved;
-            rebindEvents();
-            updateEmbed();
-          }
-        };
+
     
         function rebindEvents() {
           document.querySelectorAll("#cardsContainer > div").forEach(card => {
