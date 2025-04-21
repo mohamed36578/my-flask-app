@@ -4,7 +4,7 @@ from datetime import timedelta
 import os
 import pyrebase
 from flask_wtf.csrf import CSRFProtect
-import time
+import re
 
 # Load environment variables
 load_dotenv()
@@ -24,15 +24,13 @@ db = firebase.database()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-csrf = CSRFProtect(app)  # Change to something strong and secret in real apps
-app.config['SESSION_COOKIE_SECURE'] = True         # HTTPS only
-app.config['SESSION_COOKIE_HTTPONLY'] = True       # No JS access
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'      # Prevent CSRF
-app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024  # 2MB upload max
-# Set session timeout to 30 minutes
+csrf = CSRFProtect(app)
+app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
 
-# You may also want to set your session to be permanent so that the timeout will be applied
 @app.before_request
 def make_session_permanent():
     session.permanent = True
@@ -47,15 +45,16 @@ def login():
     password = request.form["password"]
     try:
         user = auth.sign_in_with_email_and_password(email, password)
-        # Store Firebase ID token in the session
-        id_token = user["idToken"]
         session["user"] = user["localId"]
-        session["id_token"] = id_token  # Store the token for later use
+        session["id_token"] = user["idToken"]
         return redirect("/dashboard")
     except:
         return "Invalid email or password"
 
-    
+def sanitize_key(key):
+    # Replace Firebase-restricted characters with "-"
+    return re.sub(r"[.#$/\[\]]", "-", key.strip())
+
 @app.route("/dashboard", methods=["GET", "POST"])
 def dashboard():
     if "user" not in session:
@@ -65,51 +64,26 @@ def dashboard():
     id_token = session["id_token"]
 
     if request.method == "POST":
-        post_id = request.form.get("post_id")  # user-defined ID
-        title = request.form.get('title').strip()  # remove extra spaces
-        content = request.form.get('content').strip()
+        title = request.form.get("title", "").strip()
+        content = request.form.get("content", "").strip()
+
+        if not title:
+            return "Title is required."
+
+        sanitized_title = sanitize_key(title)
 
         data = {
             "title": title,
             "content": content
         }
 
-        # Replace or create a post at posts/user_id/post_id
-        db.child("posts").child(user_id).child(post_id).set(data, id_token)
+        db.child("posts").child(user_id).child(sanitized_title).set(data, id_token)
 
         return redirect("/dashboard")
 
-    # Get all posts for the user
+    # GET: Display posts
     posts = db.child("posts").child(user_id).get(id_token).val()
-
     return render_template("dashboard.html", posts=posts)
-@app.route("/submit", methods=["POST"])
-def submit_post():
-    if "user" not in session:
-        return redirect("/")
-
-    title = request.form["title"].strip()
-    content = request.form["content"].strip()
-
-    user_id = session["user"]
-    id_token = session["id_token"]
-
-    # Generate custom ID
-    post_id = f"post_{int(time.time())}"
-
-    post_data = {
-        "title": title,
-        "content": content
-    }
-
-    # Save using your own custom ID
-    db.child("posts").child(user_id).child(post_id).set(post_data, id_token)
-
-    return redirect("/dashboard")
-
-
-
 
 if __name__ == "__main__":
     app.run(debug=False)
-
